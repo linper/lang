@@ -1,0 +1,57 @@
+<operator> ::= "/"
+                | "*"
+                | "+"
+                | "-"
+                | "~"
+
+<type-name> ::= "string"
+                | "int"
+
+<eol> ::= ";"
+
+<op_curly> ::= "{"
+
+<cl_curly> ::= "}"
+
+<op_brace> ::= "["
+
+<cl_brace> ::= "]"
+
+<int-value> ::= 0|[1-9][0-9]*
+
+<string-value> ::= \"[A-Za-z0-9_ ]*\"
+
+<variable-name> ::= [a-z_][a-z_A-Z0-9]*
+
+<function-name> ::= [A-Z][a-z_A-Z0-9]*
+
+<variable> ::= "$"<variable-name>
+
+<var-or-val> ::= <string-value>
+                | <int-value>
+                | <variable-name>
+
+<variable-initializer> ::= "new" <type-name> <variable-name><eol>
+                            | "new" <type-name> <op_brace><int-value><cl_brace> <variable-name><eol>
+                            | "new" <type-name> <op_brace><variable><cl_brace> <variable-name><eol>
+
+<assignment-statement> ::= "expr" <variable> <var-of-val><eol>
+
+<expr-assignment-statement> ::= "expr" <variable> <var-of-val> <operator> <var-of-val><eol>
+
+<call-statement> ::= "call" <variable> <function-name> <variable>*<eol>
+
+<if-statement> ::= "if" <variable> <op_curly><statement>*<cl_curly><eol>
+
+<return-statement> ::= "return" <variable><eol>
+
+<while-statement> ::= "while" <variable> <op_curly><statement>*<cl_curly><eol>
+
+<statement> ::= <if-statement>
+              | <while-statement>
+              | <call-statement>
+              | <return-statement>
+              | <assignment-statement>
+              | <expr-assignment-statement>
+
+<function> ::= "func" <variable> <function-name> <int-value> <variable-name>* <op_curly><statement>*<cl_curly><eol>

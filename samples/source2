@@ -1,0 +1,66 @@
+new string var_name;
+new int var_name;
+new int [5] var_name;
+new int [$var1] var_name;
+
+expr $var 5;
+expr $var "abc";
+expr $var $var_2;
+
+expr $var $var1 - $var2;
+expr $var $var1 - 1;
+expr $var $var1 - 5;
+expr $var 5 - $var;
+expr $var 5 - 4;
+
+while $var {
+};
+
+if $var {
+};
+
+func Func_1 1 var1 {
+    new int [5] int_var;
+    new int int_var2;
+    expr $int_var 5;
+    expr $int_var2 0;
+    while $int_var {
+        expr $int_var $int_var - 1;
+    };
+    return $var;
+};
+
+func FaktRec 3 var1 var2 counter {
+    if $counter {
+        new int ans;
+        new int n_var1;
+        new int n_var2;
+        new int n_counter;
+        expr $n_var2 $var1;
+        expr $n_var1 $var1 + $var2;
+        expr $n_counter $counter - 1;
+        call $ans FaktRec $n_var1 $n_var2 $n_counter
+        return $ans
+    };
+    return $var1;
+};
+
+func FakIter 1 counter {
+    new int var1;
+    new int var2;
+    new int temp;
+    expr $var1 1;
+    expr $var2 1;
+    new int counter;
+    while $counter {
+        expr $temp $var1;
+        expr $var1 $var1 + $var2;
+        expr $var2 $temp;
+        expr $counter $counter - 1;
+    };
+    return $var1;
+};
+
+call $var0 Func_1 $var1 $var2;
+call $var0 Func_1 "var1" $var2;
+call $var0 Func_1 $var1 5;
