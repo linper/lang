@@ -35,10 +35,10 @@ matchers = [
 def get_cp_balance():
     global counter, tok_array
     counter = 0
-    for i, _ in tok_array:
-        if i == token.OCBR:
+    for tok in tok_array:
+        if tok[0] == token.OCBR.value:
             counter += 1
-        if i == token.CCBR:
+        if tok[0] == token.CCBR.value:
             counter -= 1
     return counter    
 
@@ -46,7 +46,7 @@ def get_cp_balance():
 # should be called for every imput line
 def get_tok(data):
     global counter, tok_array
-    if counter != 0:
+    if counter == 0:
         tok_array = []
     while len(data) > 0:
         found = False
@@ -61,6 +61,7 @@ def get_tok(data):
         if not found:
             raise Exception("syntax error!")
             break
+    get_cp_balance()
     if counter < 0:
         raise Exception("to much '}'")
     # if block is not finished returns None, and stores incomplete sequence in global scope

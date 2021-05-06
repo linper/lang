@@ -1,16 +1,24 @@
+new string var_name;
+new int var_name2;
+new int [5] var_name3;
+expr $var_name2 5;
+new int [$var_name2] var_name4;
+
+expr $var 5;
+expr $var "abc";
+expr $var $var_2;
+
+expr $var $var1 - $var2;
+expr $var $var1 - 1;
+expr $var $var1 - 5;
+expr $var 5 - $var;
+expr $var 5 - 4;
+
 while $var {
-    new int var_name;
-    new int var_name2;
-    new int var_name3;
 };
 
 if $var {
 };
-
-if $var {
-    new int var_name;
-};
-
 
 func Func_1 1 var1 {
     new int [5] int_var;
