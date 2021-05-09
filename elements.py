@@ -1,6 +1,7 @@
 import random
 
 from utils import *
+from int_math import *
 # from lexer import *
 
 
@@ -31,8 +32,8 @@ class Context:
         if data[0] == token.VAR.value:
             if self.loc[-1].get(data[1]) is None:
                 raise Exception(f"variable: {data[1]}, does not exists")
-            return self.loc[-1].get(data[1])
-        return data[1]
+            return self.loc[-1].get(data[1]).data
+        return str_to_bt_arr2(data[1])
 
     def get_var(self, name):
         if self.loc[-1].get(name[1]) is None:
@@ -71,8 +72,13 @@ class Initializer:
     def __call__(self, ctx):
         ctx.assert_not_exist(self.name)
         name = self.name[1]
-        length = ctx.get_value(self.length)
+        length = bt_arr_to_int(ctx.get_value(self.length))
+        if isinstance(length, bytearray):
+            length = bt_arr_to_int(length)
+        elif isinstance(length, str):
+            length = int(length)
         var = Var(self.is_int, name, length)
+        var.data = bytearray(length)
         ctx.set_var(var)
 
 
@@ -85,17 +91,17 @@ class Assignment:
     def __call__(self, ctx):
         var = ctx.get_var(self.name)
         if var.is_int:
-            # TODO some smart stringified long int to byte array conversion. For now set random
-            # var.data = bytearray()
-            for i in range(len(var.value)):
-                var.value[i] = random.randint(0, 255)
+            if self.value[0] == token.VAR.value:
+                nv = ctx.get_value(self.value)
+                clear_bt_arr(var.data)
+                for i in range(1, min(len(nv), len(var.data))+1):
+                    var.data[-i] = nv[-i]
+            else:
+                var.data = str_to_bt_arr(self.value[1], var.length)
         else:
             if len(self.name) > var.length:
                 raise Exception(f"out of bounds for: {self.name}, with: {self.value}")
-            for i in range(1, len(self.value) + 1):
-                var.value[-i] = ord(self.value[-i])
-        # ctx.elem.append(self)
-        ctx.cur_block.append(self)
+            var.data = bytearray(self.value[1], "utf-8")
 
 
 class Expression:
@@ -107,18 +113,10 @@ class Expression:
         ctx.cur_block.append(self)
 
     def __call__(self, ctx):
-        if ctx.loc[-1].get(self.result) is None:
-            raise Exception(f"variable: {self.result}, is not declared")
-        if ctx.loc[-1].get(self.first) is None:
-            raise Exception(f"variable: {self.first}, is not declared")
-        if ctx.loc[-1].get(self.second) is None:
-            raise Exception(f"variable: {self.second}, is not declared")
-        result = ctx.loc[-1][self.result]
-        first = ctx.loc[-1][self.first]
-        second = ctx.loc[-1][self.second]
-        int_math[self.expr](result, first, second)
-        # ctx.elem.append(self)
-        ctx.cur_block.append(self)
+        result = ctx.get_var(self.result)
+        first = ctx.get_value(self.first)
+        second = ctx.get_value(self.second)
+        int_math[self.expr[1]](result, first, second)
 
 
 class If:

@@ -1,27 +1,284 @@
+import numpy as np
+import copy
+
+
+def _str_to_dec_bt_arr(_str):
+    arr = []
+    for s in _str:
+        arr.append(int(s))
+    return arr
+
+
+def _lshift_add(arr, tail=0):
+    for i in range(len(arr)-1):
+        arr[i] = arr[i+1]
+    arr[-1] = tail
+    return arr
+
+
+def _bt_more(a, b):
+    a_st = 0
+    b_st = 0
+    for i, bt in enumerate(a):
+        if bt != 0:
+            a_st = i - len(a)
+            break
+    for i, bt in enumerate(b):
+        if bt != 0:
+            b_st = i - len(b)
+            break
+    st = min(a_st, b_st)
+    while st < 0:
+        if a[st] > b[st]:
+            return True
+        if a[st] < b[st]:
+            return False
+        st += 1
+    return False
+
+
+def _get_rem(arr):
+    div = []
+    val = 0
+    start = False
+    for a in arr:
+        if val == 0 and a == 0:
+            a = 10
+        val = (10 * val + a)
+        if start or val >= 256:
+            div.append(val // 256)
+            start = True
+        val %= 256
+    return div, val
+
+
+def str_to_bt_arr(str, length):
+    bt_arr = bytearray(length)
+    dec_arr = _str_to_dec_bt_arr(str)
+    bt_count = -1
+    while len(dec_arr) > 0:
+        dec_arr, rem = _get_rem(dec_arr)
+        bt_arr[bt_count] = rem
+        bt_count -= 1
+    return bt_arr
+
+
+def naive_bt_div(a, b):
+    a_base = copy.copy(a)
+    val = 0
+    while _bt_more(a, b):
+        a = sub2(a, b)
+        val += 1
+    return val, a
+
+
+def str_to_bt_arr2(_str):
+    if isinstance(_str, bytearray):
+        return _str
+    if isinstance(_str, int):
+        _str = str(_str)
+    bt_list = []
+    dec_arr = _str_to_dec_bt_arr(_str)
+    bt_count = -1
+    while len(dec_arr) > 0:
+        dec_arr, rem = _get_rem(dec_arr)
+        bt_list.append(rem)
+        # bt_arr[bt_count] = rem
+        bt_count -= 1
+    bt_arr = bytearray(len(bt_list))
+    for i, b in enumerate(reversed(bt_list)):
+        bt_arr[i] = b
+    return bt_arr
+
+
+def bt_arr_to_int(arr):
+    val = 0
+    for i, b in enumerate(reversed(arr)):
+        val += (256 ** i) * b
+    return val
+
+
+def _add_multi_arr(arr):
+    rem = 0
+    res = bytearray(len(arr[0]))
+    for i in range(1, len(arr[0])+1):
+        sum = np.sum([a[-i] for a in arr]) + rem
+        res[-i] = sum % 256
+        rem = sum // 256
+    return res
+
+
+def _add_single(a, b, rem):
+    c = a+b+rem
+    return c % 256, c // 256
+
+
+def _sub_single(a, b, rem):
+    c = a+rem-b
+    rem = 0
+    if c < 0:
+        c += 256
+        rem = -1
+    return c, rem
+
+
+def _mul_single(a, b, rem):
+    c = (a+rem)*b
+    return c % 256, c // 256
+
+
+def clear_bt_arr(data):
+    for i in range(len(data)):
+        data[i] = 0
 
 
 def add(r, a, b):
-    pass
+    r_len = r.length
+    a_len = len(a)
+    b_len = len(b)
+    # if r_len < a_len or r_len < b_len:
+    #     raise Exception(f"not enough space in {r.name}")
+    # max_in_len = max(a_len, b_len)
+    _a = 0
+    _b = 0
+    i = 1
+    rem = 0
+    clear_bt_arr(r.data)
+    while i < r_len:
+        if i >= a_len:
+            _a = 0
+        else:
+            _a = a[-i]
+        if i >= b_len:
+            _b = 0
+        else:
+            _b = b[-i]
+        el, rem = _add_single(_a, _b, rem)
+        r.data[-i] = el
+        i += 1
 
 
 def sub(r, a, b):
-    pass
+    r_len = r.length
+    a_len = len(a)
+    b_len = len(b)
+    _a = 0
+    _b = 0
+    i = 1
+    rem = 0
+    clear_bt_arr(r.data)
+    while i < r_len:
+        if i >= a_len:
+            _a = 0
+        else:
+            _a = a[-i]
+        if i >= b_len:
+            _b = 0
+        else:
+            _b = b[-i]
+        el, rem = _sub_single(_a, _b, rem)
+        r.data[-i] = el
+        i += 1
+
+
+def sub2(a, b):
+    r = bytearray(len(a))
+    r_len = len(r)
+    a_len = len(a)
+    b_len = len(b)
+    _a = 0
+    _b = 0
+    i = 1
+    rem = 0
+    clear_bt_arr(r)
+    while i < r_len:
+        if i > a_len:
+            _a = 0
+        else:
+            _a = a[-i]
+        if i > b_len:
+            _b = 0
+        else:
+            _b = b[-i]
+        el, rem = _sub_single(_a, _b, rem)
+        r[-i] = el
+        i += 1
+    return r
 
 
 def mul(r, a, b):
-    pass
+    r_len = r.length
+    a_len = len(a)
+    _a = 0
+    add_arr = []
+    i = 1
+    rem = 0
+    clear_bt_arr(r.data)
+    for j, m in enumerate(reversed(b)):
+        i += j
+        arr = bytearray(r_len)
+        while i < r_len:
+            if i >= a_len:
+                _a = 0
+            else:
+                _a = a[-i]
+            el, rem = _mul_single(_a, m, rem)
+            arr[-i] = el
+            i += 1
+        add_arr.append(arr)
+        i = 1
+    r.data = _add_multi_arr(add_arr)
 
 
 def div(r, a, b):
-    pass
+    clear_bt_arr(r.data)
+    rem = copy.copy(r.data)
+    val = []
+    for _a in a:
+        rem = _lshift_add(rem, _a)
+        v, rem = naive_bt_div(rem, b)
+        val.append(v)
+    for i, _b in enumerate(reversed(val)):
+        r.data[-i-1] = _b
 
 
 def mod(r, a, b):
-    pass
+    clear_bt_arr(r.data)
+    rem = copy.copy(r.data)
+    val = []
+    for _a in a:
+        rem = _lshift_add(rem, _a)
+        v, rem = naive_bt_div(rem, b)
+        val.append(v)
+    r.data = rem
 
 
 # r = max(0, a-b)
 def spec(r, a, b):
-    pass
+    r_len = r.length
+    a_len = len(a)
+    b_len = len(b)
+    if r_len < a_len or r_len < b_len:
+        raise Exception(f"not enough space in {r.name}")
+    max_in_len = max(a_len, b_len)
+    _a = 0
+    _b = 0
+    i = 1
+    rem = 0
+    while i < max_in_len:
+        if i >= a_len:
+            _a = 0
+        else:
+            _a = a[-i]
+        if i >= b_len:
+            _b = 0
+        else:
+            _b = b[-i]
+        el, rem = _sub_single(_a, _b, rem)
+        r.data[-i] = el
+        i += 1
+    if rem < 0:
+        for i in range(len(r.data)):
+            r.data[i] = 0
 
 

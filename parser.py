@@ -32,7 +32,7 @@ def build_single(seq, ctx):
     b = None
     # Initializer
     if match([token.NEW, token.TSTR, token.VNAME, token.SEMI], seq):
-        e = Initializer(ctx, False, seq[2], (token.INT, len(seq[2])))
+        e = Initializer(ctx, False, seq[2], (token.INT, 4))
     elif match([token.NEW, token.TINT, token.VNAME, token.SEMI], seq):
         e = Initializer(ctx, True, seq[2], (token.INT, 4))
     elif match([token.NEW, token.TINT, token.OBR, (token.INT, token.VAR), token.CBR, token.VNAME, token.SEMI], seq):
