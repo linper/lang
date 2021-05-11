@@ -1,8 +1,5 @@
-import random
-
 from utils import *
 from int_math import *
-# from lexer import *
 
 
 class Context:
@@ -18,6 +15,7 @@ class Context:
         self.elem = []
         # list of elements in current block(if, while, function or global) important when building
         self.cur_block = self.elem
+        self.fun_ret = None
 
     def clear(self):
         self.loc = [{}]
@@ -40,6 +38,11 @@ class Context:
             raise Exception(f"variable: {name[1]}, does not exists")
         return self.loc[-1].get(name[1])
 
+    def get_fun(self, name):
+        if self.fun.get(name[1]) is None:
+            raise Exception(f"function: {name[1]}, is not declared")
+        return self.fun[name[1]]
+
     def assert_not_exist(self, data):
         if data[0] in [token.VAR.value, token.VNAME.value]:
             if self.loc[-1].get(data[1]) is not None:
@@ -50,8 +53,22 @@ class Context:
             if self.loc[-1].get(data[1]) is None:
                 raise Exception(f"variable: {data[1]}, does not exists")
 
+    def check_exist(self, data):
+        return self.loc[-1].get(data[1]) is not None
+
+    def set_fun(self, fun):
+        if self.fun.get(fun.name[1]) is not None:
+            raise Exception(f"function: {fun.name[1]}, already declared")
+        self.fun[fun.name[1]] = fun
+
     def set_var(self, var):
         self.loc[-1][var.name] = var
+
+    def set_var2(self, name):
+        self.loc[-1][name] = None
+
+    def set_var3(self, name, var):
+        self.loc[-1][name[1]] = var
 
 
 class Var:
@@ -60,6 +77,10 @@ class Var:
         self.length = length
         self.name = name
         self.data = None
+
+    def __str__(self):
+        if self.is_int:
+            return str(bt_arr_to_int())
 
 
 class Initializer:
@@ -122,35 +143,33 @@ class Expression:
 class If:
     def __init__(self, ctx, cond):
         self.cond = cond
-        self.block = []  # TODO
+        self.block = []
         ctx.cur_block.append(self)
 
     def __call__(self, ctx):
-        if ctx.loc[-1].get(self.cond) is None:
-            raise Exception(f"variable: {self.cond}, is not declared")
-        cond = ctx.loc[-1][self.cond]
-        ctx.cur_block.append(self)
-        ctx.cur_block = self.block
-        if cond.value != 0:
+        cond = ctx.get_var(self.cond)
+        if bt_arr_to_int(cond.data) != 0:
             for e in self.block:
-                e(self)
+                e(ctx)
+                if isinstance(e, Return):
+                    ctx.fun_ret = e
+                    break
 
 
 class While:
     def __init__(self, ctx, cond):
         self.cond = cond
-        self.block = []  # TODO
+        self.block = []
         ctx.cur_block.append(self)
 
     def __call__(self, ctx):
-        if ctx.loc[-1].get(self.cond) is None:
-            raise Exception(f"variable: {self.cond}, is not declared")
-        cond = ctx.loc[-1][self.cond]
-        ctx.cur_block.append(self)
-        ctx.cur_block = self.block
-        while cond.value != 0:
+        cond = ctx.get_var(self.cond)
+        while bt_arr_to_int(cond.data) != 0:
             for e in self.block:
-                e(self)
+                e(ctx)
+                if isinstance(e, Return):
+                    ctx.fun_ret = e
+                    break
 
 
 class Func:
@@ -163,13 +182,17 @@ class Func:
         ctx.cur_block.append(self)
 
     def __call__(self, ctx):
-        for a in self.args:
-            self.stack_frame[a] = None
-        if ctx.fun.get(self.name) is not None:
-            raise Exception(f"function: {self.name}, already declared")
-        ctx.fun[self.name] = self
-        ctx.cur_block.append(self)
-        ctx.cur_block = self.block
+        ctx.set_fun(self)
+        # for a in self.args:
+        #     ctx.set_var2(a[1])
+
+        # for a in self.args:
+        #     self.stack_frame[a] = None
+        # if ctx.fun.get(self.name) is not None:
+        #     raise Exception(f"function: {self.name}, already declared")
+        # ctx.fun[self.name] = self
+        # ctx.cur_block.append(self)
+        # ctx.cur_block = self.block
 
 
 class Return:
@@ -178,34 +201,56 @@ class Return:
         ctx.cur_block.append(self)
 
     def __call__(self, ctx):
-        if ctx.loc[-1].get(self.variable) is None:
-            raise Exception(f"variable: {self.variable}, is not declared")
+        ctx.assert_exist(self.variable)
 
 
 class Call:
-    def __init__(self, ctx, func, ret, *arg_val):
+    def __init__(self, ctx, func, ret, arg_val):
         self.func = func
         self.ret = ret
         self.args = arg_val  # varnames as ctx.loc[-1] keys
         ctx.cur_block.append(self)
 
     def __call__(self, ctx):
-        if ctx.fun.get(self.func) is None:
-            raise Exception(f"function: {self.func}, is not declared")
-        func = ctx.fun[self.func]
-        if ctx.loc[-1].get(self.ret) is None:
-            raise Exception(f"variable: {self.ret}, is not declared")
-        if len(func.args) != len(self.args):
+        func = ctx.get_fun(self.func)
+        if func.arg_len != len(self.args):
             raise Exception(f"wrong number of parameters in function: {self.func}")
-        for k, v in zip(func.args, self.args):  # setting parameters in stackframe for called function
-            func.stack_frame[k] = v
-        ctx.loc.append(func.stack_frame)
-        for e in func.elem:
+        ctx.assert_exist(self.ret)
+        sf = {}
+
+        # self.loc[-1][name[1]] = var
+        # ctx.set_var3(func.ret, ret_var)
+        for k, v in zip(func.args, self.args):
+            if ctx.check_exist(v):
+                var = ctx.get_var(v)
+                # ctx.set_var3(k, var)
+                sf[k[1]] = var
+            elif v[0] == token.INT.value:
+                bt_arr = str_to_bt_arr2(v[1])
+                var = Var(True, None, len(bt_arr))
+                var.data = bt_arr
+                # ctx.set_var3(k, var)
+                sf[k[1]] = var
+            else:
+                bt_arr = str_to_bt_arr2(v[1])
+                var = Var(False, None, len(bt_arr))
+                var.data = bt_arr
+                # ctx.set_var3(k, var)
+                sf[k[1]] = var
+        func.stack_frame = sf
+        ctx.loc.append(sf)
+        for e in func.block:
             e(ctx)
-            if not isinstance(e, Return):
-                ctx.loc[-2][self.ret] = ctx.loc[-1][e.variable]
+            if isinstance(e, Return):
+                ctx.loc[-2][self.ret[1]].data = ctx.loc[-1][e.variable[1]].data
                 break
-        ctx.pop()
+            if ctx.fun_ret is not None:
+                ctx.loc[-2][self.ret[1]].data = ctx.loc[-1][ctx.fun_ret.variable[1]].data
+                ctx.fun_ret = None
+                break
+
+        ctx.loc.pop()
+        func.stack_frame = ctx.loc[-1]
 
 
 

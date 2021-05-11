@@ -90,7 +90,7 @@ def build(ctx, line):
 
 # testing
 if __name__ == "__main__":
-    with open("samples/source3") as f:
+    with open("samples/source") as f:
         lines = f.readlines()
 
     # try:

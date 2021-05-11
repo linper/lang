@@ -136,26 +136,25 @@ def add(r, a, b):
     r_len = r.length
     a_len = len(a)
     b_len = len(b)
-    # if r_len < a_len or r_len < b_len:
-    #     raise Exception(f"not enough space in {r.name}")
-    # max_in_len = max(a_len, b_len)
     _a = 0
     _b = 0
     i = 1
     rem = 0
-    clear_bt_arr(r.data)
+    res_arr = copy.copy(r.data)
+    clear_bt_arr(res_arr)
     while i < r_len:
-        if i >= a_len:
+        if i > a_len:
             _a = 0
         else:
             _a = a[-i]
-        if i >= b_len:
+        if i > b_len:
             _b = 0
         else:
             _b = b[-i]
         el, rem = _add_single(_a, _b, rem)
-        r.data[-i] = el
+        res_arr[-i] = el
         i += 1
+    r.data = res_arr
 
 
 def sub(r, a, b):
@@ -166,19 +165,21 @@ def sub(r, a, b):
     _b = 0
     i = 1
     rem = 0
-    clear_bt_arr(r.data)
+    res_arr = copy.copy(r.data)
+    clear_bt_arr(res_arr)
     while i < r_len:
-        if i >= a_len:
+        if i > a_len:
             _a = 0
         else:
             _a = a[-i]
-        if i >= b_len:
+        if i > b_len:
             _b = 0
         else:
             _b = b[-i]
         el, rem = _sub_single(_a, _b, rem)
-        r.data[-i] = el
+        res_arr[-i] = el
         i += 1
+    r.data = res_arr
 
 
 def sub2(a, b):
@@ -213,7 +214,8 @@ def mul(r, a, b):
     add_arr = []
     i = 1
     rem = 0
-    clear_bt_arr(r.data)
+    res_arr = copy.copy(r.data)
+    clear_bt_arr(res_arr)
     for j, m in enumerate(reversed(b)):
         i += j
         arr = bytearray(r_len)
@@ -231,7 +233,8 @@ def mul(r, a, b):
 
 
 def div(r, a, b):
-    clear_bt_arr(r.data)
+    res_arr = copy.copy(r.data)
+    clear_bt_arr(res_arr)
     rem = copy.copy(r.data)
     val = []
     for _a in a:
@@ -239,12 +242,13 @@ def div(r, a, b):
         v, rem = naive_bt_div(rem, b)
         val.append(v)
     for i, _b in enumerate(reversed(val)):
-        r.data[-i-1] = _b
+        res_arr[-i-1] = _b
+    r.data = res_arr
 
 
 def mod(r, a, b):
-    clear_bt_arr(r.data)
     rem = copy.copy(r.data)
+    clear_bt_arr(rem)
     val = []
     for _a in a:
         rem = _lshift_add(rem, _a)
@@ -265,20 +269,23 @@ def spec(r, a, b):
     _b = 0
     i = 1
     rem = 0
+    res_arr = copy.copy(r.data)
+    clear_bt_arr(res_arr)
     while i < max_in_len:
-        if i >= a_len:
+        if i > a_len:
             _a = 0
         else:
             _a = a[-i]
-        if i >= b_len:
+        if i > b_len:
             _b = 0
         else:
             _b = b[-i]
         el, rem = _sub_single(_a, _b, rem)
-        r.data[-i] = el
+        res_arr[-i] = el
         i += 1
     if rem < 0:
-        for i in range(len(r.data)):
-            r.data[i] = 0
+        for i in range(len(res_arr)):
+            res_arr[i] = 0
+    r.data = res_arr
 
 
