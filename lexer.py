@@ -14,6 +14,7 @@ matchers = [
     re.compile(r"(^(call))"),
     re.compile(r"(^(return))[ |;|$]"),
     re.compile(r"(^(new) )"),
+    re.compile(r"(^(print) )"),
     re.compile(r"(^(;))"),
     re.compile(r"(^(string) )"),
     re.compile(r"(^(int) )"),

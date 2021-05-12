@@ -78,10 +78,6 @@ class Var:
         self.name = name
         self.data = None
 
-    def __str__(self):
-        if self.is_int:
-            return str(bt_arr_to_int())
-
 
 class Initializer:
     def __init__(self, ctx, is_int, name, length):
@@ -202,6 +198,22 @@ class Return:
 
     def __call__(self, ctx):
         ctx.assert_exist(self.variable)
+
+
+class Print:
+    def __init__(self, ctx, variable):
+        self.variable = variable
+        ctx.cur_block.append(self)
+
+    def __call__(self, ctx):
+        val = []
+        if ctx.check_exist(self.variable):
+            val = bt_arr_to_hex(ctx.get_value(self.variable))
+        elif self.variable[0] in [token.STR.value, token.INT.value]:
+            val = bt_arr_to_hex(str_to_bt_arr2(self.variable))
+        for b in val:
+            print(b, end="")
+        print()
 
 
 class Call:

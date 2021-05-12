@@ -10,20 +10,21 @@ class token(Enum):
     CALL = 4
     RETURN = 5
     NEW = 6
-    SEMI = 7
-    TSTR = 8
-    TINT = 9
-    INT = 10
-    STR = 11
-    VNAME = 12
-    FNAME = 13
-    VAR = 14
-    OP = 15
-    OBR = 16
-    CBR = 17
-    OCBR = 18
-    CCBR = 19
-    NO = 20
+    PRINT = 7
+    SEMI = 8
+    TSTR = 9
+    TINT = 10
+    INT = 11
+    STR = 12
+    VNAME = 13
+    FNAME = 14
+    VAR = 15
+    OP = 16
+    OBR = 17
+    CBR = 18
+    OCBR = 19
+    CCBR = 20
+    NO = 21
 
 
 int_math = {
@@ -33,6 +34,25 @@ int_math = {
     "/": im.div,
     "%": im.mod,
     "~": im.spec,
+}
+
+to_hex = {
+    0: "0",
+    1: "1",
+    2: "2",
+    3: "3",
+    4: "4",
+    5: "5",
+    6: "6",
+    7: "7",
+    8: "8",
+    9: "9",
+    10: "A",
+    11: "B",
+    12: "C",
+    13: "D",
+    14: "E",
+    15: "F",
 }
 
 

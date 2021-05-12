@@ -52,8 +52,11 @@ def build_single(seq, ctx):
         e = While(ctx, seq[1])
         b = seq[3:len(seq)-2]
     #  Return
-    elif match([token.RETURN, token.VAR], seq):
+    elif match([token.RETURN, token.VAR, token.SEMI], seq):
         e = Return(ctx, seq[1])
+    #  Print
+    elif match([token.PRINT, token.VAR, token.SEMI], seq):
+        e = Print(ctx, seq[1])
     #  Func
     elif len(seq) > 4 and match([token.INT], [seq[2]]) and match([token.FUNC, token.FNAME, token.INT] + \
                            [token.VNAME for i in range(int(seq[2][1]))] + [token.OCBR, -1, token.CCBR, token.SEMI], seq):
@@ -90,7 +93,7 @@ def build(ctx, line):
 
 # testing
 if __name__ == "__main__":
-    with open("samples/source") as f:
+    with open("samples/source4") as f:
         lines = f.readlines()
 
     # try:

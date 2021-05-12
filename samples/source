@@ -33,4 +33,15 @@ func FakIter 1 counter {
 new int var0;
 new int var1;
 call $var0 FakIter 5;
+print $var0;
 call $var1 FaktRec 1 1 5;
+print $var1;
+
+new int [32] var3;
+new int [32] var4;
+new int [64] var5;
+expr $var1 2222222222222222222222222222222222222222222222222222222222222;
+expr $var1 1111111111111111111111111111111111111111111111111111111111111;
+expr $var5 $var4 + $var3;
+print $var5;
+

@@ -1,6 +1,33 @@
 import numpy as np
 import copy
 
+to_hex = {
+    0: "0",
+    1: "1",
+    2: "2",
+    3: "3",
+    4: "4",
+    5: "5",
+    6: "6",
+    7: "7",
+    8: "8",
+    9: "9",
+    10: "A",
+    11: "B",
+    12: "C",
+    13: "D",
+    14: "E",
+    15: "F",
+}
+
+
+def bt_arr_to_hex(arr):
+    hex_arr = []
+    for b in arr:
+        hex_arr.append(to_hex.get(b // 16))
+        hex_arr.append(to_hex.get(b % 16))
+    return hex_arr
+
 
 def _str_to_dec_bt_arr(_str):
     arr = []
@@ -56,7 +83,7 @@ def str_to_bt_arr(str, length):
     bt_arr = bytearray(length)
     dec_arr = _str_to_dec_bt_arr(str)
     bt_count = -1
-    while len(dec_arr) > 0:
+    while len(dec_arr) > 0 and -bt_count <= length:
         dec_arr, rem = _get_rem(dec_arr)
         bt_arr[bt_count] = rem
         bt_count -= 1
@@ -123,7 +150,7 @@ def _sub_single(a, b, rem):
 
 
 def _mul_single(a, b, rem):
-    c = (a+rem)*b
+    c = a*b+rem
     return c % 256, c // 256
 
 
