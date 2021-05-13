@@ -16,6 +16,7 @@ class Context:
         # list of elements in current block(if, while, function or global) important when building
         self.cur_block = self.elem
         self.fun_ret = None
+        self.exec_idx = 0
 
     def clear(self):
         self.loc = [{}]
@@ -23,8 +24,9 @@ class Context:
         self.elem = []
 
     def execute(self):
-        for e in self.elem:
-            e(self)
+        for ei in range(self.exec_idx, len(self.elem)):
+            self.exec_idx = ei+1 # if next line breaks
+            self.elem[ei](self)
 
     def get_value(self, data):
         if data[0] == token.VAR.value:
@@ -107,7 +109,7 @@ class Assignment:
 
     def __call__(self, ctx):
         var = ctx.get_var(self.name)
-        if var.is_int:
+        if var.is_int and self.value[0] != token.STR.value:
             if self.value[0] == token.VAR.value:
                 nv = ctx.get_value(self.value)
                 clear_bt_arr(var.data)
@@ -115,10 +117,12 @@ class Assignment:
                     var.data[-i] = nv[-i]
             else:
                 var.data = str_to_bt_arr(self.value[1], var.length)
-        else:
+        elif not var.is_int and self.value[0] == token.STR.value:
             if len(self.name) > var.length:
                 raise Exception(f"out of bounds for: {self.name}, with: {self.value}")
             var.data = bytearray(self.value[1], "utf-8")
+        else:
+            raise Exception(f"type mismatch")
 
 
 class Expression:
@@ -207,13 +211,16 @@ class Print:
 
     def __call__(self, ctx):
         val = []
-        if ctx.check_exist(self.variable):
+        if self.variable[0] == token.INT.value:
+            val = bt_arr_to_hex(str_to_bt_arr2(self.variable[1]))
+        elif self.variable[0] == token.STR.value:
+            val = bt_arr_to_hex(bytearray(self.variable[1], "utf-8"))
+        elif ctx.check_exist(self.variable):
             val = bt_arr_to_hex(ctx.get_value(self.variable))
-        elif self.variable[0] in [token.STR.value, token.INT.value]:
-            val = bt_arr_to_hex(str_to_bt_arr2(self.variable))
+        ctx.assert_exist(self.variable)
         for b in val:
             print(b, end="")
-        print()
+        # print()
 
 
 class Call:

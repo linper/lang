@@ -41,6 +41,8 @@
 
 <call-statement> ::= "call" <variable> <function-name> <variable>*<eol>
 
+<print-statement> ::= "print" <var-or-val> <function-name> <variable>*<eol>
+
 <if-statement> ::= "if" <variable> <op_curly><statement>*<cl_curly><eol>
 
 <return-statement> ::= "return" <variable><eol>
@@ -53,5 +55,6 @@
               | <return-statement>
               | <assignment-statement>
               | <expr-assignment-statement>
+              | <print-statement>
 
 <function> ::= "func" <variable> <function-name> <int-value> <variable-name>* <op_curly><statement>*<cl_curly><eol>

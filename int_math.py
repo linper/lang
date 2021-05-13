@@ -43,7 +43,7 @@ def _lshift_add(arr, tail=0):
     return arr
 
 
-def _bt_more(a, b):
+def _bt_more_or_equal(a, b):
     a_st = 0
     b_st = 0
     for i, bt in enumerate(a):
@@ -55,22 +55,26 @@ def _bt_more(a, b):
             b_st = i - len(b)
             break
     st = min(a_st, b_st)
+    if abs(st) > len(a):
+        return False
+    if abs(st) > len(b):
+        return True
     while st < 0:
         if a[st] > b[st]:
             return True
         if a[st] < b[st]:
             return False
         st += 1
-    return False
+    return True
 
 
 def _get_rem(arr):
     div = []
     val = 0
     start = False
-    for a in arr:
-        if val == 0 and a == 0:
-            a = 10
+    for a in arr: # TODO might fail later
+        # if val != 0 and a == 0:
+        #     a = 10
         val = (10 * val + a)
         if start or val >= 256:
             div.append(val // 256)
@@ -91,9 +95,8 @@ def str_to_bt_arr(str, length):
 
 
 def naive_bt_div(a, b):
-    a_base = copy.copy(a)
     val = 0
-    while _bt_more(a, b):
+    while _bt_more_or_equal(a, b):
         a = sub2(a, b)
         val += 1
     return val, a
@@ -110,7 +113,6 @@ def str_to_bt_arr2(_str):
     while len(dec_arr) > 0:
         dec_arr, rem = _get_rem(dec_arr)
         bt_list.append(rem)
-        # bt_arr[bt_count] = rem
         bt_count -= 1
     bt_arr = bytearray(len(bt_list))
     for i, b in enumerate(reversed(bt_list)):
@@ -263,6 +265,7 @@ def div(r, a, b):
     res_arr = copy.copy(r.data)
     clear_bt_arr(res_arr)
     rem = copy.copy(r.data)
+    clear_bt_arr(rem)
     val = []
     for _a in a:
         rem = _lshift_add(rem, _a)
@@ -276,11 +279,11 @@ def div(r, a, b):
 def mod(r, a, b):
     rem = copy.copy(r.data)
     clear_bt_arr(rem)
-    val = []
+    # val = []
     for _a in a:
         rem = _lshift_add(rem, _a)
         v, rem = naive_bt_div(rem, b)
-        val.append(v)
+        # val.append(v)
     r.data = rem
 
 

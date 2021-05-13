@@ -1,3 +1,4 @@
+import sys
 import token
 from lexer import *
 from utils import *
@@ -55,7 +56,7 @@ def build_single(seq, ctx):
     elif match([token.RETURN, token.VAR, token.SEMI], seq):
         e = Return(ctx, seq[1])
     #  Print
-    elif match([token.PRINT, token.VAR, token.SEMI], seq):
+    elif match([token.PRINT, (token.VAR, token.STR, token.INT), token.SEMI], seq):
         e = Print(ctx, seq[1])
     #  Func
     elif len(seq) > 4 and match([token.INT], [seq[2]]) and match([token.FUNC, token.FNAME, token.INT] + \
@@ -93,19 +94,47 @@ def build(ctx, line):
 
 # testing
 if __name__ == "__main__":
-    with open("samples/source4") as f:
-        lines = f.readlines()
+    is_interactive = True
+    source_file = ""
+    argi = 1
+    while argi < len(sys.argv):
+        if sys.argv[argi] == "-i":
+            is_interactive = True
+        elif sys.argv[argi] == "-f":
+            is_interactive = False
+            source_file = sys.argv[argi+1]
+            argi += 1
+        else:
+            print("Unsupported argument")
+        argi += 1
 
-    # try:
-        ctx = Context()
-        for line in lines:
-            if (tok_line := get_tok(line)) is None:
-                continue
-            if tok_line[0] == token.NO:
-                continue
-            if not build(ctx, tok_line):
-                exit(1)
-        ctx.execute()
-    # except Exception as e:
-    #     print(f"ERROR:{e}")
+    ctx = Context()
+    if not is_interactive:
+        with open(source_file) as f:
+            lines = f.readlines()
+        try:
+            for line in lines:
+                if (tok_line := get_tok(line)) is None:
+                    continue
+                if tok_line[0] == token.NO:
+                    continue
+                if not build(ctx, tok_line):
+                    exit(1)
+            ctx.execute()
+        except Exception as e:
+            print(f"ERROR:{e}")
+            exit(1)
+    else:
+        while True:
+            line = input()
+            try:
+                if (tok_line := get_tok(line)) is None:
+                    continue
+                if tok_line[0] == token.NO:
+                    continue
+                if not build(ctx, tok_line):
+                    exit(1)
+                ctx.execute()
+            except Exception as e:
+                print(f"ERROR:{e}")
     exit(0)
