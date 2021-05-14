@@ -73,8 +73,6 @@ def _get_rem(arr):
     val = 0
     start = False
     for a in arr: # TODO might fail later
-        # if val != 0 and a == 0:
-        #     a = 10
         val = (10 * val + a)
         if start or val >= 256:
             div.append(val // 256)
@@ -248,15 +246,12 @@ def mul(r, a, b):
     i = 1
     rem = 0
     for j, m in enumerate(reversed(b)):
-        # i = j
         arr = bytearray(r_len)
         while i < r_len:
             if i >= a_len:
                 _a = 0
             else:
                 _a = a_cp[-i]
-            if m != 0 and _a != 0:
-                g= 0
             el, rem = _mul_single(_a, m, rem)
             arr[-i] = el
             i += 1
@@ -284,11 +279,9 @@ def div(r, a, b):
 def mod(r, a, b):
     rem = copy.copy(r.data)
     clear_bt_arr(rem)
-    # val = []
     for _a in a:
         rem = _lshift_add(rem, _a)
         v, rem = naive_bt_div(rem, b)
-        # val.append(v)
     r.data = rem
 
 

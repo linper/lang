@@ -183,16 +183,6 @@ class Func:
 
     def __call__(self, ctx):
         ctx.set_fun(self)
-        # for a in self.args:
-        #     ctx.set_var2(a[1])
-
-        # for a in self.args:
-        #     self.stack_frame[a] = None
-        # if ctx.fun.get(self.name) is not None:
-        #     raise Exception(f"function: {self.name}, already declared")
-        # ctx.fun[self.name] = self
-        # ctx.cur_block.append(self)
-        # ctx.cur_block = self.block
 
 
 class Return:
@@ -237,24 +227,19 @@ class Call:
         ctx.assert_exist(self.ret)
         sf = {}
 
-        # self.loc[-1][name[1]] = var
-        # ctx.set_var3(func.ret, ret_var)
         for k, v in zip(func.args, self.args):
             if ctx.check_exist(v):
                 var = ctx.get_var(v)
-                # ctx.set_var3(k, var)
                 sf[k[1]] = var
             elif v[0] == token.INT.value:
                 bt_arr = str_to_bt_arr2(v[1])
                 var = Var(True, None, len(bt_arr))
                 var.data = bt_arr
-                # ctx.set_var3(k, var)
                 sf[k[1]] = var
             else:
                 bt_arr = str_to_bt_arr2(v[1])
                 var = Var(False, None, len(bt_arr))
                 var.data = bt_arr
-                # ctx.set_var3(k, var)
                 sf[k[1]] = var
         func.stack_frame = sf
         ctx.loc.append(sf)

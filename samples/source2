@@ -1,59 +1,17 @@
-while $var {
-    new int var_name;
-    new int var_name2;
-    new int var_name3;
-};
-
-if $var {
-};
-
-if $var {
-    new int var_name;
-};
-
-
-func Func_1 1 var1 {
-    new int [5] int_var;
-    new int int_var2;
-    expr $int_var 5;
-    expr $int_var2 0;
-    while $int_var {
-        expr $int_var $int_var - 1;
-    };
-    return $var;
-};
-
-func FaktRec 3 var1 var2 counter {
-    if $counter {
-        new int ans;
-        new int n_var1;
-        new int n_var2;
-        new int n_counter;
-        expr $n_var2 $var1;
-        expr $n_var1 $var1 + $var2;
-        expr $n_counter $counter - 1;
-        call $ans FaktRec $n_var1 $n_var2 $n_counter;
-        return $ans;
-    };
-    return $var1;
-};
-
-func FakIter 1 counter {
-    new int var1;
-    new int var2;
-    new int temp;
-    expr $var1 1;
-    expr $var2 1;
-    new int counter;
-    while $counter {
-        expr $temp $var1;
-        expr $var1 $var1 + $var2;
-        expr $var2 $temp;
-        expr $counter $counter - 1;
-    };
-    return $var1;
-};
-
-call $var0 Func_1 $var1 $var2;
-call $var0 Func_1 "var1" $var2;
-call $var0 Func_1 $var1 5;
+new int [32] var3;
+new int [32] var4;
+new int [64] var5;
+expr $var3 680564733841876926926749214863536422912;
+expr $var4 340282366920938463463374607431768211456;
+expr $var5 $var3 + $var4;
+print $var5;
+expr $var5 $var3 - $var4;
+print $var5;
+expr $var5 $var3 ~ $var4;
+print $var5;
+expr $var5 $var3 * $var4;
+print $var5;
+expr $var5 $var3 / $var4;
+print $var5;
+expr $var5 $var3 % $var4;
+print $var5;

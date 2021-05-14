@@ -107,7 +107,6 @@ def strip_tokens(data, op, cl, replacement):
             if len(s) > 0:
                 data = list_replace(data, s, [replacement])
                 f_list.append(s)
-                # f_list.append(s[1: -1])
     return data, f_list
 
 

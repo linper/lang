@@ -67,9 +67,6 @@ def build_single(seq, ctx):
     elif len(seq) >= 4 and match([token.CALL, token.VAR, token.FNAME] + \
                                  [(token.VAR, token.STR, token.INT) for i in range(len(seq) - 4)] + [token.SEMI], seq):
         e = Call(ctx, seq[2], seq[1], [i for i in seq[3:3+len(seq) - 4]])
-
-    # a = [token.FUNC, token.FNAME, token.INT] + \
-    #                        [token.VNAME for i in range(int(seq[2][1]))] + [token.OCBR, -1, token.CCBR, token.SEMI]
     return e, b
 
 
@@ -81,7 +78,6 @@ def build(ctx, line):
     for seq in funs:
         e, b = build_single(seq, ctx)
         if e is not None:
-            # ctx.cur_block.append(e)
             if b is not None and len(b) > 0:
                 cb = ctx.cur_block
                 ctx.cur_block = e.block
@@ -92,7 +88,6 @@ def build(ctx, line):
     return True
 
 
-# testing
 if __name__ == "__main__":
     is_interactive = True
     source_file = ""

@@ -55,7 +55,6 @@ def get_tok(data):
         for i, m in enumerate(matchers):
             if m := re.match(m, data):
                 tok_array.append((i, m.group(2)))
-                # print(str(i) + " " + m.group(2))
                 data = data[len(m.group(1)):].strip()
                 found = True
                 break
@@ -69,12 +68,3 @@ def get_tok(data):
         return None
     # else returns token-value list
     return tok_array
-                
-
-# testing
-if __name__ == "__main__":
-    with open("source") as f:
-        lines = f.readlines()
-
-    for line in lines:
-        get_tok(line)
