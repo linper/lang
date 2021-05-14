@@ -237,27 +237,32 @@ def sub2(a, b):
 
 
 def mul(r, a, b):
-    r_len = r.length
-    a_len = len(a)
-    _a = 0
-    add_arr = []
-    i = 1
-    rem = 0
     res_arr = copy.copy(r.data)
     clear_bt_arr(res_arr)
+    r_len = r.length
+    a_cp = bytearray(r_len)
+    a_cp[r_len - len(a):] = a
+    a_len = len(a_cp)
+    add_arr = []
+    _a = 0
+    i = 1
+    rem = 0
     for j, m in enumerate(reversed(b)):
-        i += j
+        # i = j
         arr = bytearray(r_len)
         while i < r_len:
             if i >= a_len:
                 _a = 0
             else:
-                _a = a[-i]
+                _a = a_cp[-i]
+            if m != 0 and _a != 0:
+                g= 0
             el, rem = _mul_single(_a, m, rem)
             arr[-i] = el
             i += 1
         add_arr.append(arr)
         i = 1
+        a_cp = _lshift_add(a_cp, 0)
     r.data = _add_multi_arr(add_arr)
 
 

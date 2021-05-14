@@ -220,7 +220,7 @@ class Print:
         ctx.assert_exist(self.variable)
         for b in val:
             print(b, end="")
-        # print()
+        print()
 
 
 class Call:
